@@ -4,7 +4,6 @@ RUN apt-get update -y && apt-get install -y python3 python3-pip cmake ninja-buil
 
 # Install LLVM/MLIR 18
 # see https://apt.llvm.org/
-# NOTE: apt-key add is deprecated
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 RUN apt-add-repository "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" && \
     apt-get update  && \

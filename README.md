@@ -10,6 +10,12 @@ This uses LLVM/MLIR installed by apt-get, instead of ones built from source code
 
 ```bash
 # use image in GHCR
+# WARNING: image size is large! (over 2GB)
+$ docker run -it --rm ghcr.io/syuparn/mlir-hello:main bash
+root@032a4b2bb9d6:/mlir-hello# ./build/bin/hello-opt ./test/Hello/print.mlir > print.ll
+root@032a4b2bb9d6:/mlir-hello# /lib/llvm-18/bin/lli print.ll
+1.000000 2.000000 3.000000 
+4.000000 5.000000 6.000000
 
 # or build locally
 $ docker build . -t hello-mlir:latest
