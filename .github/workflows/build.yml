@@ -10,48 +10,34 @@ on:
   pull_request:
     branches: [ main ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  build-and-push-image:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    permissions:
+      contents: read
+      packages: write
     steps:
-      - uses: actions/checkout@v2
-      - uses: seanmiddleditch/gha-setup-ninja@master
-
-      - name: Install prerequisites
-        run: |
-          sudo apt update
-          sudo apt install -y uuid-dev
-
-      - name: Cache LLVM artifact
-        id: cache-llvm
-        uses: actions/cache@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
         with:
-          path: |
-            ./thirdparty/llvm-project
-          key: ${{ runner.os }}-norm-${{ hashFiles('thirdparty/llvm-project/llvm/CMakeLists.txt') }}
-
-      - name: Build LLVM
-        if: steps.cache-llvm.outputs.cache-hit != 'true'
-        run: |
-          git submodule update --init --recursive
-          cd thirdparty/llvm-project
-          mkdir build && cd build
-          cmake -G Ninja ../llvm -DLLVM_ENABLE_PROJECTS=mlir -DLLVM_BUILD_EXAMPLES=ON -DLLVM_ENABLE_ASSERTIONS=ON -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_RTTI=ON -DLLVM_TARGETS_TO_BUILD="host"
-          cmake --build . --target check-mlir
-
-      - name: Build mlir-hello
-        run: |
-          mkdir build && cd build
-          cmake -DLLVM_DIR=$PWD/../thirdparty/llvm-project/build/lib/cmake/llvm -DMLIR_DIR=$PWD/../thirdparty/llvm-project/build/lib/cmake/mlir ..
-          cmake --build . --target all
-
-      - name: Test mlir-hello
-        run: |
-          cd build
-          cmake -DLLVM_DIR=$PWD/../thirdparty/llvm-project/build/lib/cmake/llvm -DMLIR_DIR=$PWD/../thirdparty/llvm-project/build/lib/cmake/mlir ..
-          cmake --build . --target check-hello
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}  
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

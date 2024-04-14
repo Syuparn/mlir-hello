@@ -1,8 +1,24 @@
-# MLIR Hello Dialect ![nightly build status](https://github.com/Lewuathe/mlir-hello/actions/workflows/nightly-build.yml/badge.svg)
+# MLIR Hello Dialect
 
 This is the minimal example to look into the way to implement the hello-world kind of program with MLIR. The basic code structure is borrowed from [standalone](https://github.com/llvm/llvm-project/tree/main/mlir/examples/standalone) and [Toy language](https://github.com/llvm/llvm-project/tree/main/mlir/examples/toy) in LLVM project.
 
-We constantly check the compatibility with the latest LLVM/MLIR in [the nightly build](https://github.com/Lewuathe/mlir-hello/actions/workflows/nightly-build.yml). The status of the build is shown in the badge above.
+
+## Image
+
+This is the fork of the [milr-hello](https://github.com/Lewuathe/mlir-hello).
+This uses LLVM/MLIR installed by apt-get, instead of ones built from source code.
+
+```bash
+# use image in GHCR
+
+# or build locally
+$ docker build . -t hello-mlir:latest
+$ docker run -it --rm hello-mlir:latest bash
+root@364092bad1ee:/mlir-hello# ./build/bin/hello-opt ./test/Hello/print.mlir > print.ll
+root@364092bad1ee:/mlir-hello# /lib/llvm-18/bin/lli print.ll
+1.000000 2.000000 3.000000 
+4.000000 5.000000 6.000000
+```
 
 ## Prerequisites
 
