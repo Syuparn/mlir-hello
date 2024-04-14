@@ -229,3 +229,5 @@ Temporary Items
 
 build/*
 .vscode
+
+.cache/*

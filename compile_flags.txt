@@ -1,0 +1,4 @@
+-xc++
+-Iinclude
+-DLLVM_DIR=/lib/llvm-18/lib/cmake/llvm
+-DMLIR_DIR=/lib/llvm-18/lib/cmake/mlir
