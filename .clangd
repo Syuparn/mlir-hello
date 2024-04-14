@@ -1,0 +1,4 @@
+# use for syntax highlight
+CompileFlags:
+  Remove:
+    - -fno-lifetime-dse
